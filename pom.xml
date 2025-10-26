@@ -9,6 +9,9 @@
   <url>https://www.crossnetcorp.com</url>
 
   <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
     <jackson.version>2.17.2</jackson.version>
     <graaljs.version>25.0.1</graaljs.version>
     <velocity.version>2.3</velocity.version>
