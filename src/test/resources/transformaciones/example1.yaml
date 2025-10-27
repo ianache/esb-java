@@ -1,0 +1,28 @@
+flows:
+  - name: default
+    description: "Flujo de procesamiento con Velocity"
+    inflow:
+      - name: JsonStringToJava
+        type: StrJson2Java@v1
+        description: Convertir de texto a JSON
+      - name: transform
+        type: JsonTranslation@v1
+        description: "Transformacion de documentos JSONs"
+        properties:
+          engine: velocity
+          code: |
+            {
+              "resultado": $payload.get('customer')
+            }
+    outflow:
+      - name: JsonStringToJava
+        type: StrJson2Java@v1
+        description: Convertir de texto a JSON
+      - name: transform
+        type: JsonTranslation@v1
+        description: "Transformacion de documentos JSONs"
+        properties:
+          engine: velocity
+          code: |
+            {"value": $payload.get('resultado')}
+    exception: []
