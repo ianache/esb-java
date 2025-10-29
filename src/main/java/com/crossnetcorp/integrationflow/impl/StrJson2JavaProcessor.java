@@ -4,8 +4,13 @@ import com.crossnetcorp.integrationflow.FlowException;
 import com.crossnetcorp.integrationflow.FlowMessage;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 import com.crossnetcorp.integrationflow.IProcessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A processor that converts a text payload to a JSON payload.
@@ -13,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @param <A> The type of the payload.
  */
 public class StrJson2JavaProcessor<A> extends IProcessor<A> { 
+    private static final Logger logger = LogManager.getLogger(StrJson2JavaProcessor.class);
+
     /**
      * Constructs a new Json2JavaProcessor.
      *
@@ -37,11 +44,18 @@ public class StrJson2JavaProcessor<A> extends IProcessor<A> {
         FlowMessage<A> out = in;
         try {
             // Converts the JSON string to a JsonNode object
-            JsonNode json = mapper.readTree(in.getPayload().toString());
+            JsonNode json = mapper.readTree(in.getPayload().toString());      
+            
+            
+            
+            
+            
             out.setPayload((A)json);
+            return out;
 
-        } catch (Exception e) { }
-
-        return out;
+        } catch (JsonProcessingException e) { 
+            logger.error(e.getMessage());
+            throw new FlowException(this.getFlow().getName(), e.getMessage());
+        }
     }
 }

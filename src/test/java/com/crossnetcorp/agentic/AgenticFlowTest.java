@@ -76,21 +76,21 @@ public class AgenticFlowTest {
     }
 
     private static String buildPoint(String vector, String payload) {
-        return String.format("""
-            {
-          "wait": true,
-          "points": [
-            {
-              "id": 1,
-              "vector": %s,
-              "payload": {
-                 "text": "%s",
-                 "author": "Ilver Anache Pupo",
-                 "source": "Caso de Prueba"
-              }
-            }
-          ]
-        }
-          """,vector,payload);
+        return String.format(
+          "{" +
+          "\"wait\": true,"+
+          "\"points\": ["+
+            "{"+
+              "\"id\": 1," +
+              "\"vector\": %s," +
+              "\"payload\": {"+
+                 "\"text\": \"%s\","+
+                 "\"author\": \"Ilver Anache Pupo\","+
+                 "\"source\": \"Caso de Prueba\""+
+              "}" +
+            "}"+
+          "]"+
+        "}",
+        vector,payload);
     }
 }

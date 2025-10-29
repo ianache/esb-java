@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-// import java.util.concurrent.Flow;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,8 +33,8 @@ public abstract class IIntegrationFlow<A, B> {
      * @throws FlowException If an error occurs during the flow.
      */
     public A handle(A payload, HandleProcess<A> process) throws FlowException {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        Map<String, Object> headers = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
+        Map<String, Object> headers = new HashMap<>();
 
         FlowMessage<A> message = new FlowMessage<>(payload, headers, properties );
         for(IProcessor<A> processor : inflow) {
