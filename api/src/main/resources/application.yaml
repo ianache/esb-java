@@ -1,0 +1,10 @@
+logging:
+  level:
+    org.springframework: INFO #DEBUG
+    org.apache.velocity: DEBUG
+    com: DEBUG
+
+server:
+  tomcat:
+    connection-timeout: 60000 # Aumentar el tiempo para que Tomcat espere datos (en ms)
+    max-connections: 1000 # Opcional: Aumentar el número máximo de conexiones
