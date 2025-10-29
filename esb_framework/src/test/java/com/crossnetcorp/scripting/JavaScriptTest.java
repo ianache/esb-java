@@ -15,8 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.crossnetcorp.GeneralIntegrationFlow;
 import com.crossnetcorp.IntegrationFlowManager;
+import com.crossnetcorp.config.IConfigurationLoader;
+import com.crossnetcorp.config.impl.ConfigurationLoaderFromFile;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 import com.crossnetcorp.transformation.TestInput;
+import com.crossnetcorp.config.ConfigurationException;
 
 /**
  * Test class for the JavaScript (js) Scripting flow.
@@ -25,14 +28,18 @@ import com.crossnetcorp.transformation.TestInput;
 public class JavaScriptTest {
     private static final Logger logger = LogManager.getLogger(JavaScriptTest.class);
 
-    static IntegrationFlowManager<Object> manager = 
-        new IntegrationFlowManager<>(GeneralIntegrationFlow.class);
-
     static String CONFIG_FILE="scripting\\example3_javascript";
+
+    static IConfigurationLoader<Object> loader = new ConfigurationLoaderFromFile<>(GeneralIntegrationFlow.class, CONFIG_FILE);
+    static IntegrationFlowManager<Object> manager = new IntegrationFlowManager<>(loader, GeneralIntegrationFlow.class);
 
     @BeforeAll
     public static void setUp() {
-       manager.loadConfigurationFromFile(CONFIG_FILE);
+       try {
+            manager.setUp(); 
+        } catch(ConfigurationException ex) { 
+            logger.error(ex.getMessage(),ex); 
+        }
     }
 
     /**

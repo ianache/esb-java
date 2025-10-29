@@ -15,6 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.crossnetcorp.GeneralIntegrationFlow;
 import com.crossnetcorp.IntegrationFlowManager;
+import com.crossnetcorp.config.ConfigurationException;
+import com.crossnetcorp.config.IConfigurationLoader;
+import com.crossnetcorp.config.impl.ConfigurationLoaderFromFile;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 import com.crossnetcorp.transformation.TestInput;
 
@@ -25,15 +28,20 @@ import com.crossnetcorp.transformation.TestInput;
 public class PythonTest {
     private static final Logger logger = LogManager.getLogger(JavaScriptTest.class);
 
-    static IntegrationFlowManager<Object> manager = 
-        new IntegrationFlowManager<>(GeneralIntegrationFlow.class);
-
     static String CONFIG_FILE="scripting\\example3_python";
+
+    static IConfigurationLoader<Object> loader = new ConfigurationLoaderFromFile<>(GeneralIntegrationFlow.class, CONFIG_FILE);
+    static IntegrationFlowManager<Object> manager = new IntegrationFlowManager<>(loader, GeneralIntegrationFlow.class);
 
     @BeforeAll
     public static void setUp() {
-       manager.loadConfigurationFromFile(CONFIG_FILE);
+       try {
+            manager.setUp(); 
+        } catch(ConfigurationException ex) { 
+            logger.error(ex.getMessage(),ex); 
+        }
     }
+
 
     /**
      * Tests the Python transformation in the integration flow.

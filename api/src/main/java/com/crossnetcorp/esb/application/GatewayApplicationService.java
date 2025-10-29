@@ -7,17 +7,26 @@ import com.crossnetcorp.GeneralIntegrationFlow;
 import com.crossnetcorp.IntegrationFlowManager;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 
+import com.crossnetcorp.config.ConfigurationException;
+import com.crossnetcorp.config.IConfigurationLoader;
+import com.crossnetcorp.config.impl.ConfigurationLoaderFromFile;
+
 @Service
 public class GatewayApplicationService {
     private static final Logger logger = LogManager.getLogger(GatewayApplicationService.class);
 
+    private IConfigurationLoader<Object> loader = new ConfigurationLoaderFromFile<>(GeneralIntegrationFlow.class, CONFIG_FILE);
     private IntegrationFlowManager<Object> manager = 
-        new IntegrationFlowManager<>(GeneralIntegrationFlow.class);
+        new IntegrationFlowManager<>(loader, GeneralIntegrationFlow.class);
 
     static String CONFIG_FILE="flows";
 
     public GatewayApplicationService() {
-        this.manager.loadConfigurationFromFile(CONFIG_FILE);
+       try {
+            manager.setUp(); 
+        } catch(ConfigurationException ex) { 
+            logger.error(ex.getMessage(),ex); 
+        }
     }
 
     public Object executeFlow(String domain, String service, String payload) {
@@ -27,7 +36,7 @@ public class GatewayApplicationService {
         Object result = flow.handle(
             (Object)payload,
             (message) -> {
-                String endpoint = message.getProperties().get("endpoint");
+                String endpoint = (String)message.getProperties().get("endpoint");
                 logger.debug(message);
                 logger.info("Calling ENDPOINT {}", endpoint != null ? endpoint : "-");
                 //

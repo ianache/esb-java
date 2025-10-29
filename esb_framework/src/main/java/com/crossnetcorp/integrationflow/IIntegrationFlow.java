@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +33,16 @@ public abstract class IIntegrationFlow<A, B> {
      */
     public abstract void setUpflows(Configuration config);
 
+    public FlowMessage<A> handle(FlowMessage<A> in, HandleProcess<A> process) throws FlowException {
+        if(in == null) throw new FlowException(this.name, "Input message is null");
+        
+        FlowMessage<A> message = in;
+        message.setException(null);
+        message.setProperties(message.getProperties() == null ? new HashMap<>() : message.getProperties());
+        message.setHeaders(message.getHeaders() == null ? new HashMap<>() : message.getHeaders());
+        return run(message, process);
+    }
+
     /**
      * Handles the integration flow.
      *
@@ -43,8 +54,18 @@ public abstract class IIntegrationFlow<A, B> {
     public A handle(A payload, HandleProcess<A> process) throws FlowException {
         Map<String, Object> properties = new HashMap<>();
         Map<String, Object> headers = new HashMap<>();
-
         FlowMessage<A> message = new FlowMessage<>(payload, headers, properties );
+        FlowMessage<A> result = run(message, process);
+        return result != null ? result.getPayload() : null;
+    }
+
+    private FlowMessage<A> run(FlowMessage<A> message, HandleProcess<A> process) throws FlowException {
+        if(message == null) throw new FlowException(this.name, "Input message is null");
+        if(process == null) throw new FlowException(this.name, "Process must be specified");
+        
+        message.getProperties().put("x-flow_name", this.name);
+        message.getProperties().put("x-flow_id", UUID.randomUUID().toString());
+
         for(IProcessor<A> processor : inflow) {
             try {
                 message = processor.process(message);
@@ -85,7 +106,7 @@ public abstract class IIntegrationFlow<A, B> {
             throw message.getException();
         }
 
-        return message.getPayload();
+        return message;
     }
 
     /**
