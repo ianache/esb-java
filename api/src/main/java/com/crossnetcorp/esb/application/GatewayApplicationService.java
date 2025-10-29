@@ -27,7 +27,13 @@ public class GatewayApplicationService {
         Object result = flow.handle(
             (Object)payload,
             (message) -> {
-                logger.info(message);
+                String endpoint = message.getProperties().get("endpoint");
+                logger.debug(message);
+                logger.info("Calling ENDPOINT {}", endpoint != null ? endpoint : "-");
+                //
+                // Aquí se debería invocar al endpoint determinado por (domain, service)
+                // y la respuesta colocada en message.setPayload( ... )
+                //
                 return message;
             }
         );
