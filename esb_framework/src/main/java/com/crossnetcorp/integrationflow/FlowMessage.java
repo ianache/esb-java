@@ -29,6 +29,13 @@ public class FlowMessage<A> {
         this.properties = properties;
     }
 
+    public FlowMessage(A payload) {
+        super();
+        this.payload = payload;
+        this.headers = new HashMap<>();
+        this.properties = new HashMap<>();
+    }
+
     /**
      * Gets the headers of the message.
      *

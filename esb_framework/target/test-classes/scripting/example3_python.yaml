@@ -1,0 +1,30 @@
+flows:
+  - name: default
+    description: "Flujo de procesamiento con Python"
+    inflow:
+      - name: validate
+        type: PythonScript@v1
+        description: "Transforma de tramas con Python"
+        properties:
+          code: |
+            def process_payload(payload):
+              return f"{payload.upper()} procesado"
+
+            process_payload(payload)
+    outflow: []
+    exception: []
+
+  - name: respuestaJson
+    description: "Flujo de procesamiento con respuesta formateada con Python"
+    inflow:
+      - name: validate
+        type: PythonScript@v1
+        description: "Transforma de tramas con Python"
+        properties:
+          code: |
+            def process_payload(payload):
+              return {"respuesta": f"{payload.upper()} procesado"}
+            process_payload(payload)
+    outflow: []
+    exception: []
+

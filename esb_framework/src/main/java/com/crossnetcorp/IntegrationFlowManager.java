@@ -37,44 +37,6 @@ public class IntegrationFlowManager<X> {
         this.loader = loader;
     }
 
-    /**
-     * Loads the configuration from the specified YAML file.
-     *
-     * @param configFile The path to the configuration file (without the .yaml extension).
-     * @param flowName The name of the flow to use.
-     */
-    /* public void loadConfigurationFromFile(String configFile) {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        String resourcePath = configFile + ".yaml";
-        logger.info("Reading flows configuration file: {}", resourcePath);
-
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
-            // File configData = new File("classpath:" + configFile + ".yaml");
-            if (inputStream == null) {
-                logger.error("Archivo de configuración NO encontrado en el classpath: {}", resourcePath);
-                return; 
-            }
-
-            this.configs = mapper.readValue(inputStream, Configurations.class);
-            logger.debug(configs.toString());
-
-            this.configs.getFlows().forEach(flow -> {
-                try {
-                    Constructor<?> _constructor = this.flowClass.getDeclaredConstructor(String.class);
-                    CustomIntegrationFlow<X> _flow = (CustomIntegrationFlow<X>)_constructor.newInstance(new Object [] {flow.name});
-                    _flow.setUpflows(flow);
-                    logger.info("Registering flow: {}", flow.name);
-                    this.flows.put(flow.name, _flow);
-                } catch(Throwable ex) {
-                    logger.error(ex.getMessage());
-                }
-            });
-
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-    */
     public void setUp() throws ConfigurationException {
         this.flows = (loader != null) ? loader.loadConfigurations(): new HashMap<>();
     }
