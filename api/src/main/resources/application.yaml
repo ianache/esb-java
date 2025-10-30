@@ -14,3 +14,10 @@ server:
   tomcat:
     connection-timeout: 60000 # Aumentar el tiempo para que Tomcat espere datos (en ms)
     max-connections: 1000 # Opcional: Aumentar el número máximo de conexiones
+
+  # Timeout de lectura/escritura en segundos
+  undertow:
+    io-threads: 16 
+    worker-threads: 256
+    direct-buffers: true
+    buffer-size: 8192

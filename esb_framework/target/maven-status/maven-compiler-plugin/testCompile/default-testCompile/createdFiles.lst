@@ -1,9 +1,0 @@
-com\crossnetcorp\agentic\AgenticFlowTest.class
-com\crossnetcorp\logistica\LogisticaViajesTest.class
-com\crossnetcorp\AppTest.class
-com\crossnetcorp\transformation\VelocityFlowTest.class
-com\crossnetcorp\transformation\TestInput.class
-com\crossnetcorp\transformation\JsonValidationTest.class
-com\crossnetcorp\scripting\TestInput.class
-com\crossnetcorp\scripting\JavaScriptTest.class
-com\crossnetcorp\scripting\PythonTest.class

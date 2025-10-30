@@ -11,7 +11,7 @@ export const options = {
 
 const SLEEP_DURATION = 0.1;
 
-const testData = open("viajes_carga.json");
+const testData = open("viajes_carga_200.json");
 
 export function setup() {
     return { data: testData };
