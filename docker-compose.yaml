@@ -1,0 +1,10 @@
+
+
+services:
+  esb:
+    image: xnet/esb:0.1.0
+    ports:
+      - "8084:8080"
+    env_file:
+      - path: .env
+        required: false

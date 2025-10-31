@@ -1,55 +1,78 @@
 # ==========================================================
 # ETAPA 1: BUILDER (Compilación de la aplicación Java)
+# ... (Sin cambios aquí)
 # ==========================================================
-# Usamos una imagen de Maven que ya tiene el JDK y las herramientas de compilación
-FROM maven:3.9.6-openjdk-17 AS builder
-
+FROM maven:3.8.7-openjdk-18 AS builder
 WORKDIR /app
-
-# 1. Copiar el código fuente del proyecto Java
-# Copia el pom.xml primero para aprovechar el cache de las dependencias
 COPY pom.xml .
-# Descarga las dependencias Maven. Esta capa solo se reconstruye si el pom.xml cambia.
+COPY api ./api
+COPY esb_framework ./esb_framework
 RUN mvn dependency:go-offline
-
-# Copia el resto del código fuente
-COPY src/ ./src/
-
-# 2. Compilar el proyecto y generar el JAR ejecutable
-# El comando 'package' compila y empaqueta la aplicación
-RUN mvn clean package -DskipTests
+RUN mvn clean install -DskipTests
 
 # ==========================================================
 # ETAPA 2: RUNTIME (Entorno de Ejecución Final)
 # ==========================================================
-# Usar una imagen base ligera de Python (ya que incluye la librería C necesaria para Node.js)
-FROM python:3.11-slim
+FROM amazoncorretto:21-alpine3.19
+#FROM amazoncorretto:21-jdk-alpine3.19
 
 WORKDIR /app
 
-# 1. INSTALACIÓN DE NODE.JS Y DEPENDENCIAS
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# 1. DEFINIR VERSIÓN DE NODEJS Y FUSIONAR TODAS LAS INSTALACIONES Y LIMPIEZAS
+ENV NODE_VERSION=20.10.0
+ENV NODE_TMP_FILE="node-v${NODE_VERSION}-linux-x64.tar.xz"
+
+RUN NODE_VERSION=${NODE_VERSION} && \
+    apk update && \
+    apk add --no-cache \
+        python3 \
+        py3-pip \
+        nodejs-lts \
+        npm \
+        # Dependencias comunes de construcción para Python
+        build-base \
+        linux-headers \
+        # Dependencias para descargar Node.js
         curl \
-        # Instalar un JRE ligero para ejecutar el JAR (si no se instala el JDK)
-        # openjdk-17-jre-headless es más ligero que el JDK completo
-        openjdk-17-jre-headless \
-    && rm -rf /var/lib/apt/lists/*
+        tar \
+        xz \
+    && \
+   # 3. LIMPIEZA FINAL: Eliminar herramientas de construcción
+    # NO TOCAMOS curl, tar, o xz AQUÍ para evitar conflictos.
+    apk del build-base linux-headers && \
+    rm -rf /var/cache/apk/* /tmp/* /var/log/*
 
-# 2. Instalar Node.js para JavaScript
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-    apt-get install -y nodejs
+RUN apk add --no-cache nodejs-lts
 
-# 3. Copiar dependencias de Python/Node.js e instalarlas
-# Estas dependencias NO se compilaron en la Etapa 1
+ENV PATH="/usr/local/bin:$PATH"
+
+# 4. PRUEBA DE INSTALACIÓN (Opcional, pero útil)
+RUN java -version
+RUN python3 --version
+RUN node -v
+RUN npm -v
+
+# 5. Copiar dependencias de Python/Node.js e instalarlas
 COPY requirements.txt .
-COPY package.json .
-RUN pip install --no-cache-dir -r requirements.txt
-RUN npm ci
+# COPY package.json . # Asume que tienes un package.json
+#RUN pip install --no-cache-dir -r requirements.txt
+# RUN npm ci # Habilitar si usas package.json
 
-# 4. Copiar el JAR compilado desde la etapa 'builder'
-# La ruta 'target/...' es estándar para Maven
-COPY --from=builder /app/target/*.jar /app/your-app.jar
+# Crear un entorno virtual en un directorio temporal, instalar dependencias, y limpiarlo.
+# Usamos /opt/venv como directorio persistente para el entorno virtual.
+RUN python3 -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install --no-cache-dir -r requirements.txt && \
+    # Desactivar venv (opcional, pero buena práctica)
+    deactivate
 
-# 5. Comando de Ejecución (inicia la aplicación Java)
-CMD ["java", "-jar", "your-app.jar"]
+# 6. Asegurar que los binarios del venv estén en el PATH para la ejecución final
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 6. Copiar el JAR compilado
+# Revisa la ruta: /app/api/target/api.jar es correcto si tu proyecto es multi-módulo
+COPY --from=builder /app/api/target/api-*jar /app/api.jar
+
+# 7. Comando de Ejecución
+CMD ["java", "-jar", "api.jar"]
+
