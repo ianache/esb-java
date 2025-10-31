@@ -6,6 +6,8 @@ import com.crossnetcorp.config.ConfigurationException;
 import com.crossnetcorp.config.Configurations;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -36,10 +38,14 @@ public class ConfigurationLoaderFromFile<X> extends IConfigurationLoader<X> {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         logger.info("Reading flows configuration file: {}", this.configFileName);
 
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(configFileName)) {
+        // Bandera para saber si el archivo es local o de classpath
+        boolean isAbsolutePath = new File(configFileName).isAbsolute();
+
+        try (InputStream inputStream = getStream(configFileName, isAbsolutePath)) {
             if (inputStream == null) {
-                logger.error("Archivo de configuración NO encontrado en el classpath: {}", configFileName);
-                throw new ConfigurationException(String.format("Archivo de configuración NO encontrado en el classpath: %s", configFileName));
+                String location = isAbsolutePath ? "absolute system path" : "classpath";
+                logger.error("Configuration file NOT FOUND at {}: {}", location, configFileName);
+                throw new ConfigurationException(String.format("Configuration file NOT FOUND at %s: %s", location, configFileName));
             }
 
             this.configs = mapper.readValue(inputStream, Configurations.class);
@@ -64,4 +70,19 @@ public class ConfigurationLoaderFromFile<X> extends IConfigurationLoader<X> {
 
         return flows;
     }
+
+    /**
+     * Método auxiliar para obtener el InputStream del recurso.
+     */
+    private InputStream getStream(String fileName, boolean isAbsolutePath) throws IOException {
+    if (isAbsolutePath) {
+        // Opción 1: Leer desde una ruta absoluta del disco
+        logger.info("Loading configuration from absolute path: {}", fileName);
+        return new FileInputStream(fileName);
+    } else {
+        // Opción 2: Leer desde el Classpath (comportamiento original)
+        logger.info("Leyendo configuración desde el classpath: {}", fileName);
+        return getClass().getClassLoader().getResourceAsStream(fileName);
+    }
+}
 }
