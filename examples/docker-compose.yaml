@@ -10,9 +10,19 @@ services:
       - JAVA_TOOL_OPTIONS=-XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -Dpolyglot.engine.WarnInterpreterOnly=false
     volumes:
       - "./flows/flows.yaml:/flows/flows.yaml"
-#
-## Componente de monitoreo
-#
+  #
+  ## ESB Logistica
+  #
+  esb_logistica:
+    image: xnet/esb:0.1.0
+    ports:
+      - "8086:8080"
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -Dpolyglot.engine.WarnInterpreterOnly=false
+
+  #
+  ## Componente de monitoreo
+  #
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
