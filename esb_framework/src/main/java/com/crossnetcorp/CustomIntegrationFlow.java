@@ -1,13 +1,9 @@
 package com.crossnetcorp;
 
-import com.crossnetcorp.config.Configurations;
 import com.crossnetcorp.config.Step;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 import com.crossnetcorp.integrationflow.IProcessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -43,7 +39,6 @@ public class CustomIntegrationFlow<A> extends IIntegrationFlow<A, A>{
         super();
         this.name = flowName;
         this.setPayloadType(getPayloadTypeFromSuperclass());
-        // this.loadConfiguration(configFile, flowName != null ? flowName : "default");
     }
 
     @Override
@@ -112,7 +107,7 @@ public class CustomIntegrationFlow<A> extends IIntegrationFlow<A, A>{
                 }
                 classMapping.load(input);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error(ex.getMessage());
             }
         }
         return Class.forName(classMapping.getProperty(tag));

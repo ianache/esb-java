@@ -6,7 +6,6 @@ import com.crossnetcorp.config.ConfigurationException;
 import com.crossnetcorp.config.Configurations;
 import com.crossnetcorp.integrationflow.IIntegrationFlow;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -18,11 +17,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.crossnetcorp.config.Configurations;
 
 public class ConfigurationLoaderFromFile<X> extends IConfigurationLoader<X> {
     private static final Logger logger = LogManager.getLogger(ConfigurationLoaderFromFile.class);
-    private static String DEFAULT_CONFIG = "default.yaml";
+    private final static String DEFAULT_CONFIG = "flows.yaml";
     private Configurations configs = new Configurations();
     private String configFileName;
 

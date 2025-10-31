@@ -21,3 +21,16 @@ server:
     worker-threads: 256
     direct-buffers: true
     buffer-size: 8192
+
+esb:
+  configuration:
+    # Puede ser file o database
+    source: file  
+    file: "flows.yaml"
+    #
+    ## Configuracion por Base de Datos
+    #
+    #source: database
+    url: "jdbc:postgres://root:welcome1@esbdb/esb"
+    username: root
+    password: welcome1

@@ -8,12 +8,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Represents an abstract processor in an integration flow.
  *
  * @param <A> The type of the payload.
  */
 public abstract class IProcessor<A> {
+    private static final Logger logger = LogManager.getLogger(IProcessor.class);
+
     private IIntegrationFlow<A,A> flow = null;
     private Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -94,15 +99,26 @@ public abstract class IProcessor<A> {
     public void setProp(String pName, Object pValue) {
         try {
             Field f = this.getClass().getDeclaredField(pName);
-            if(pValue == null || f.getType().equals(Object.class)) {
+            Class<?> fieldType = f.getType();
+            if(pValue == null || 
+                fieldType.equals(Object.class) || 
+                fieldType.isInstance(pValue))
+            {
                 f.setAccessible(true);
                 f.set(this, pValue);
-            } else if(f != null && pValue != null) {
+            } else {
                 String mn = "set" + pName.substring(0,1).toUpperCase() + pName.substring(1);
                 Method method = findMethod(this.getClass(), mn);
-                if(method != null) { method.invoke(this, pValue); }
+                if(method != null) { 
+                    method.invoke(this, pValue); 
+                } else {
+                    logger.error("No setter found for property '{}'", pName);
+                }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
         properties.put(pName, pValue);
     }
 

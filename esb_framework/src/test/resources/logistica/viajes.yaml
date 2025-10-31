@@ -2,6 +2,13 @@ flows:
   - name: programacion
     description: "Programacion de Viajes"
     inflow:
+      - name: ipfiltering
+        type: WhiteBlackList@v1
+        description: "Chequeo de IP remote. Solo permite llamadas desde 127.0.0.1"
+        properties:
+          kind: blacklist # whitelist
+          cidrs: []
+          #  - "127.0.0.1/32"
       - name: text2Json
         type: StrJson2Java@v1
         description: Convertir a Json real

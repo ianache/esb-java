@@ -75,13 +75,11 @@ public abstract class IIntegrationFlow<A, B> {
             }
         }
 
-        if(process != null) {
-            try {
-                message = process.process(message);
-            } catch (FlowException e) {
-                logger.error(e.getMessage());
-                message.setException(e);
-            }
+        try {
+            message = process.process(message);
+        } catch (FlowException e) {
+            logger.error(e.getMessage());
+            message.setException(e);
         }
 
         if(message.getException() == null) {

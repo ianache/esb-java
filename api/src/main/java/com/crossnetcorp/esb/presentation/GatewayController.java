@@ -1,10 +1,11 @@
 package com.crossnetcorp.esb.presentation;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,18 +43,21 @@ public class GatewayController {
         produces = MediaType.APPLICATION_JSON_VALUE  // Devuelve JSON
     )
     public ResponseEntity<Object> processResourceData(
+            @RequestHeader Map<String, String> headersMap,
             @PathVariable String domain,
             @PathVariable String resource,
             @RequestBody String payload) {
 
-        System.out.println("--- Nueva Petición ---");
-        System.out.println("Recurso (Path Variable) solicitado: " + resource);
-        System.out.println("Cuerpo (Body) de texto recibido:\n" + payload);
-        System.out.println("------------------------");
+        logger.debug("--- Nueva Petición ---");
+        logger.debug("Recurso (Path Variable) solicitado: " + resource);
+        logger.debug("Cuerpo (Body) de texto recibido:\n" + payload);
+        logger.debug("------------------------");
 
         // Aquí iría la lógica de negocio para guardar o procesar el 'textPayload'
         // asociado al 'resource'.
-        Object result = gatewayService.executeFlow(domain, resource, payload);
+        Map<String, Object> headers = new HashMap<>();
+        headersMap.forEach((k, v) -> headers.put(k,v) );
+        Object result = gatewayService.executeFlow(domain, resource,payload, headers);
         logger.debug(result);
 
         //String responseMessage = String.format(

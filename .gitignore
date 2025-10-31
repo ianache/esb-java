@@ -1,3 +1,5 @@
 target/**
+api/target/**
+esb_framework/target/**
 .class
 .jar

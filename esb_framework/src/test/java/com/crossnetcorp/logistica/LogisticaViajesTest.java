@@ -14,10 +14,10 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.provider.Arguments;
 
 import com.crossnetcorp.GeneralIntegrationFlow;
 import com.crossnetcorp.IntegrationFlowManager;
@@ -102,7 +102,7 @@ public class LogisticaViajesTest {
      *
      * @return A stream of test input data.
      */
-    static Stream<TestInput> provideTestData() {
+    static Stream<Arguments> provideTestData() {
         List<TestInput> data = List.of(
             new TestInput(
                 "programacion",
@@ -110,7 +110,8 @@ public class LogisticaViajesTest {
                 "HOLA MUNDO procesado"
             )
         );
-        return data.stream();
+
+        return data.stream().map(Arguments::of);
     }
 
     private static String getViajes() {
