@@ -1,0 +1,17 @@
+global:
+  # Intervalo predeterminado para recolectar métricas (cada 15 segundos)
+  scrape_interval: 15s 
+  
+# Define dónde buscar los objetivos (targets) para recolectar métricas
+scrape_configs:
+  - job_name: 'prometheus'
+    # Recolecta las métricas del propio Prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'esb-echo'
+    # Recolecta las métricas de tu servicio Java/Spring Boot
+    # Usa el nombre del servicio Docker Compose como hostname y su puerto interno (8080)
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['esb_echo:8080']

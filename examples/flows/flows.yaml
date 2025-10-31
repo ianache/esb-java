@@ -1,0 +1,18 @@
+flows:
+  - name: echo
+    description: Flujo vacio (echo)
+    inflow: []
+    outflow: []
+    exception: []
+  - name: hello
+    description: Flujo Hola
+    inflow:
+      - name: sayHello
+        type: PythonScript@v1
+        properties:
+          code: |
+            def sayHello(payload):
+              return f"Hola {payload.upper()}!"
+            sayHello(payload)
+    outflow: []
+    exception: []
